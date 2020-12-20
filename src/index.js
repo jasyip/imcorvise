@@ -18,8 +18,10 @@ import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
             openSheetMusicDisplay.setLogLevel("info");
             document.body.appendChild(canvas);
 
-            openSheetMusicDisplay.load(file);
-            openSheetMusicDisplay.render();
+            file.text().then(text => {
+                openSheetMusicDisplay.load(text);
+                openSheetMusicDisplay.render();
+            });
         }
     }
 
