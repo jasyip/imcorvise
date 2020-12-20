@@ -18,7 +18,7 @@ import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
             openSheetMusicDisplay.setLogLevel("info");
             document.body.appendChild(canvas);
 
-            openSheetMusicDisplay.load(DocumentBuilderFactory.newInstance();
+            openSheetMusicDisplay.load(file);
             openSheetMusicDisplay.render();
         }
     }
