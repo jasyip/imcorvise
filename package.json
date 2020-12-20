@@ -1,15 +1,16 @@
 {
   "name": "imcorvise",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start" : "node src\\index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Jason Yip",
   "license": "MIT",
   "dependencies": {
     "opensheetmusicdisplay": "^0.8.7"
-  }
+  },
+  "devDependencies": {},
+  "keywords": [],
+  "description": ""
 }
