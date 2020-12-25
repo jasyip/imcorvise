@@ -10,29 +10,28 @@ import { ImcorviseMeasure } from "./graphical"
     {
         osmd.load(text);
         osmd.render();
+
         let gs = osmd.GraphicSheet;
         let measureList = gs.MeasureList;
         let svgContainer = document.getElementById("osmdSvgPage1");
+        //typeof measure => GraphicalMeasure
         measureList.forEach(function(measureCol, ind)
         {
             let measure = measureCol[0];
             let color = ind % 2 === 0 ? "red" : "blue";
+          console.log(measure);
             let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            let boundingBox = measure.staffEntries[0].PositionAndShape;
-            boundingBox.calculateAbsolutePosition();
-            let boundingRect = boundingBox.BoundingRectangle;
-            
-            rect.setAttributeNS(null, "x", boundingRect.x);
-            rect.setAttributeNS(null, "y", boundingRect.y);
-            rect.setAttributeNS(null, "height", boundingRect.height);
-            rect.setAttributeNS(null, "width", boundingRect.width);
+            let boundingBox = measure.boundingBox;
+            console.log(boundingBox);
+
+            let scale = 10.0;
+            rect.setAttributeNS(null, "x", boundingBox.absolutePosition.x * scale);
+            rect.setAttributeNS(null, "y", boundingBox.absolutePosition.y * scale);
+            rect.setAttributeNS(null, "height", boundingBox.size.height * scale);
+            rect.setAttributeNS(null, "width", boundingBox.size.width * scale);
             rect.setAttributeNS(null, "fill", color);
             rect.setAttributeNS(null, "opacity", 0.4);
-            
-            if (ind === 0)
-            {
-                console.log(boundingRect);
-            }
+
             svgContainer.appendChild(rect);
         });
     }

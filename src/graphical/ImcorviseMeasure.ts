@@ -3,7 +3,7 @@ import Vex from "vexflow";
 export class ImcorviseMeasure extends Vex.Flow.Stave
 {
 
-    private function onmousedown(staff): void
+    private function onmousedown(): void
     {
         
     }
@@ -46,9 +46,9 @@ export class ImcorviseMeasure extends Vex.Flow.Stave
         super.resetLines();
     }
 
-    public draw(): void
+    public draw(ctx: Vex.IRenderContext): void
     {
-        this.context.
+        
         super.draw();
     }
 }
