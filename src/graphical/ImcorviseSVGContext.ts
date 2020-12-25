@@ -1,4 +1,4 @@
-import { Vex } from "vexflow";
+import Vex from "vexflow";
 
 export class ImcorviseSVGContext from Vex.Flow.SVGContext
 {

@@ -1,4 +1,4 @@
-import { Vex } from "vexflow";
+import Vex from "vexflow";
 
 export class ImcorviseSystem extends Vex.Flow.System
 {
