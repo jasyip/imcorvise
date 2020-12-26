@@ -1,62 +1,51 @@
+import
+{
+    VexFlowMeasure,
+    Staff,
+    SourceMeasure,
+    StaffLine,
+    SystemLinesEnum
+}
+    from "opensheetmusicdisplay";
 import Vex from "vexflow";
 
-export class ImcorviseMeasure extends Vex.Flow.Stave
+import { ImcorviseStave } from "./ImcorviseStave";
+
+
+export class ImcorviseMeasure extends VexFlowMeasure
 {
-
-    private function onmousedown(): void
-    {
-        
-    }
-
-    private function onmouseup(): void
-    {
-
-    }
-
-    private function onmouseenter(): void
-    {
-
-    }
-
-    private function onmouseleave(): void
-    {
-
-    }
-
+/*
     constructor
     (
-        x: number,
-        y: number,
-        width: number,
-        options: object,
+        staff: Staff,
+        sourceMeasure: SourceMeasure = undefined,
+        staffLine: StaffLine = undefined
     )
     {
-        super(x, y, width, options);
-        Vex.Merge(this.options, {
-            box_fill_style: "#000000";
-            onmousedown: onmousedown,
-            onmouseup: onmouseup, 
-            onmouseenter: onmouseenter, 
-            onmouseleave: onmouseleave
+        super(staff, sourceMeasure, staffLine);
+    }
+*/
+
+    public resetLayout(): void
+    {
+        this.stave = new ImcorviseStave(0, 0, 0,{
+            fill_style: this.rules.StaffLineColor,
+            space_above_staff_ln: 0,
+            space_below_staff_ln: 0
         });
-    }
-
-    public resetLines(): void
-    {
-        super.resetLines();
-    }
-
-    public draw(ctx: Vex.IRenderContext): void
-    {
         
-        super.draw();
-    }
-}
+        if (this.ParentStaff)
+        {
+            this.setLineNumber(this.ParentStaff.StafflineCount);
+        }
 
-export const COLOR_STATE: string[][] =
-{
-    //untouched and unselected, touched and unselected
-    {"#000000", "#444444"},
-    //untouched and selected, touched and selected,
-    {"#7FBFFF", "#7FCFFF"}
+        this.stave.setBegBarType(Vex.Flow.Barline.type.NONE);
+        if (this.parentSourceMeasure
+                && this.parentSourceMeasure.endingBarStyleEnum === SystemLinesEnum.NONE)
+        {
+            this.stave.setEndBarType(Vex.Flow.Barline.type.NONE);
+        }
+
+        this.updateInstructionWidth();
+    }
 }

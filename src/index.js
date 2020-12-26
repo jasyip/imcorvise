@@ -1,17 +1,17 @@
-import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
-import { ImcorviseMeasure } from "./graphical"
+import { Imcorvise } from "./Imcorvise/Imcorvise";
+//import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 
 (function ()
 {
-    let osmd;
-    let osmdDiv;
+    let imcorvise;
+    let imcorviseDiv;
 
-    function startOSMD(text)
+    function startImcorvise(text)
     {
-        osmd.load(text);
-        osmd.render();
-
-        let gs = osmd.GraphicSheet;
+        imcorvise.load(text);
+        imcorvise.render();
+/*
+        let gs = imcorvise.GraphicSheet;
         let measureList = gs.MeasureList;
         let svgContainer = document.getElementById("osmdSvgPage1");
         //typeof measure => GraphicalMeasure
@@ -34,19 +34,20 @@ import { ImcorviseMeasure } from "./graphical"
 
             svgContainer.appendChild(rect);
         });
+*/
     }
-    
+   
     function loadFile()
     {
         let file = event.target.files[0];
         if (file)
         {
-            osmdDiv = document.createElement("div");
-            osmd = new OpenSheetMusicDisplay(osmdDiv);
-            osmd.setLogLevel("info");
-            document.body.appendChild(osmdDiv);
+            imcorviseDiv = document.createElement("div");
+            imcorvise = new Imcorvise(imcorviseDiv);
+            imcorvise.setLogLevel("info");
+            document.body.appendChild(imcorviseDiv);
 
-            file.text().then(startOSMD);
+            file.text().then(startImcorvise);
         }
     }
 
