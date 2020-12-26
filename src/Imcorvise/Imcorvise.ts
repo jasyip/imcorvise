@@ -1,8 +1,6 @@
 import
 {
     OpenSheetMusicDisplay,
-    IOSMDOptions,
-    OSMDOptions,
     GraphicalMusicSheet
 }
     from "opensheetmusicdisplay";
@@ -11,6 +9,7 @@ import { ImcorviseMusicSheetCalculator } from "../Graphical/ImcorviseMusicSheetC
 
 export class Imcorvise extends OpenSheetMusicDisplay
 {
+    
     /*
     constructor
     (
@@ -20,7 +19,8 @@ export class Imcorvise extends OpenSheetMusicDisplay
     {
         super(container, options);
     }
-*/
+    */
+
     public updateGraphic(): void
     {
         const calc: MusicSheetCalculator = new ImcorviseMusicSheetCalculator(this.rules);

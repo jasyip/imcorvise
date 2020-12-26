@@ -11,7 +11,6 @@ import { ImcorviseMeasure } from "./ImcorviseMeasure"
 
 export class ImcorviseGraphicalSymbolFactory extends VexFlowGraphicalSymbolFactory
 {
-/*
     public createGraphicalMeasure
     (
         sourceMeasure: SourceMeasure,
@@ -22,7 +21,7 @@ export class ImcorviseGraphicalSymbolFactory extends VexFlowGraphicalSymbolFacto
     {
         return new ImcorviseMeasure(staff, sourceMeasure, undefined);
     }
-*/
+
     public createExtraGraphicalMeasure(staffLine: StaffLine): GraphicalMeasure
     {
         return new ImcorviseMeasure(staffLine.ParentStaff, undefined, staffLine);
