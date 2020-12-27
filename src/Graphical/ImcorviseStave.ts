@@ -1,65 +1,109 @@
 import Vex from "vexflow";
 
+import { VexFlowMeasure } from "opensheetmusicdisplay";
+
 export class ImcorviseStave extends Vex.Flow.Stave
 {
 
+    constructor
+    (
+        parentVFMeasure: VexFlowMeasure,
+        x: number,
+        y: number,
+        width: number,
+        options: object = {}
+    )
+    {
+        super(x, y, width, options);
+        this.parentVFMeasure = parentVFMeasure;    
+    }
+
+
+
     private onmousedown(): void
     {
-        console.log(this.measure + " DOWN");
+        //console.log(this.measure.parentVFMeasure);
     }
 
     private onmouseup(): void
     {
-
-        console.log(this.measure + " UP");
+        
     }
 
-    private onmouseenter(): void
+    private onmouseenter(event): void
     {
-        console.log(this.measure + " ENTER");
-
+        //console.log(event.button);
+        this.style.stroke = "red"
+        
     }
 
-    private onmouseleave(): void
+    private onmouseleave(event): void
     {
-        console.log(this.measure + " LEAVE");
+        //console.log(event.button);
+        this.style.stroke = "none";
     }
 
-    constructor
-    (
-        x: number,
-        y: number,
-        width: number,
-        options: object,
-    )
-    {
-        super(x, y, width, options);
-        Vex.Merge(this.options, {
-            box_stroke: "none";
-            onmousedown: onmousedown,
-            onmouseup: onmouseup, 
-            onmouseenter: onmouseenter, 
-            onmouseleave: onmouseleave
-        });
-    }
-
-    public resetLines(): void
-    {
-        super.resetLines();
-    }
 
     public draw(): void
     {    
-        super.draw();
-        this.context.save();
-        this.context.rect(this.x, this.getTopLineTopY(), this.width, this.getHeight(), {
-            stroke: this.options.box_stroke,
-            onmousedown: this.options.onmousedown,
-            onmouseup: this.options.onmouseup,
-            onmouseenter: this.options.onmouseenter,
-            onmouseleave: this.options.onmouseleave
-        });
-        this.context.restore();
+        this.checkContext();
+        this.setRendered();
+
+        if (!this.formatted)
+        {
+            this.format();
+        }
+
+        const num_lines = this.options.num_lines;
+
+
+        // Render lines
+        for (let line = 0; line < num_lines; ++line) {
+            let y = this.getYForLine(line);
+            this.applyStyle();
+            if (this.options.line_config[line].visible) {
+                this.context.beginPath();
+                this.context.moveTo(this.x, y);
+                this.context.lineTo(this.x + this.width, y);
+                this.context.stroke();
+            }
+            this.restoreStyle();
+        }
+
+        // Draw the modifiers (bar lines, coda, segno, repeat brackets, etc.)
+        for (let i = 0; i < this.modifiers.length; ++i) {
+          // Only draw modifier if it has a draw function
+            if (typeof this.modifiers[i].draw === 'function') {
+                this.modifiers[i].applyStyle();
+                this.modifiers[i].draw(this, this.getModifierXShift(i));
+                this.modifiers[i].restoreStyle();
+            }
+        }
+
+        this.applyStyle();
+        this.context.rect(
+                this.x,
+                this.getTopLineTopY(),
+                this.width,
+                this.getBottomLineBottomY() - this.getTopLineTopY(),
+                {
+                    fill: "none",
+                    stroke: "none",
+                }
+        );
+        this.restoreStyle();
+
+        if (this.context.svg)
+        {
+            let addedElement = this.context.svg.lastElementChild;
+            addedElement.style.pointerEvents = "all";
+            addedElement.onmousedown = this.onmousedown;
+            addedElement.onmouseup = this.onmouseup;
+            addedElement.onmouseenter = this.onmouseenter;
+            addedElement.onmouseleave = this.onmouseleave;
+            addedElement.measure = this;
+        }
+
         return this;
     }
 }

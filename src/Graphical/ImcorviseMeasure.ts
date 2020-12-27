@@ -14,6 +14,7 @@ import { ImcorviseStave } from "./ImcorviseStave";
 
 export class ImcorviseMeasure extends VexFlowMeasure
 {
+
 /*
     constructor
     (
@@ -26,14 +27,17 @@ export class ImcorviseMeasure extends VexFlowMeasure
     }
 */
 
+
     public resetLayout(): void
     {
-        this.stave = new ImcorviseStave(0, 0, 0,{
+        this.stave = new ImcorviseStave(this, 0, 0, 0, {
             fill_style: this.rules.StaffLineColor,
             space_above_staff_ln: 0,
             space_below_staff_ln: 0
         });
         
+        this.stave.setMeasure(this.MeasureNumber);
+
         if (this.ParentStaff)
         {
             this.setLineNumber(this.ParentStaff.StafflineCount);

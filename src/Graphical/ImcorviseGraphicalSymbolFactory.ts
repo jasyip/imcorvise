@@ -3,7 +3,8 @@ import
     VexFlowGraphicalSymbolFactory,
     SourceMeasure,
     Staff,
-    StaffLine
+    StaffLine,
+    VexFlowMeasure
 }
     from "opensheetmusicdisplay";
 
