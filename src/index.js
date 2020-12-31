@@ -10,7 +10,6 @@ import { Imcorvise } from "./Imcorvise/Imcorvise";
     {
         imcorvise.load(text);
         imcorvise.render();
-        document.getElementById("osmdSvgPage1").style.pointerEvents = "none";
 /*
         let gs = imcorvise.GraphicSheet;
         let measureList = gs.MeasureList;

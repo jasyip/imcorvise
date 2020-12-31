@@ -7,7 +7,7 @@ import
     from "opensheetmusicdisplay";
 
 import { ImcorviseGraphicalSymbolFactory } from "./ImcorviseGraphicalSymbolFactory";
-
+import { ImcorviseMusicSystemBuilder } from "./ImcorviseMusicSystemBuilder";
 
 export class ImcorviseMusicSheetCalculator extends VexFlowMusicSheetCalculator
 {
