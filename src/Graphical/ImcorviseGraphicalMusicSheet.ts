@@ -5,6 +5,8 @@ import
 }
     from "opensheetmusicdisplay";
 
+import { ImcorviseStave } from "./ImcorviseStave";
+
 export class ImcorviseGraphicalMusicSheet extends GraphicalMusicSheet
 {
     public SelectedMeasures: Set[];
@@ -23,6 +25,22 @@ export class ImcorviseGraphicalMusicSheet extends GraphicalMusicSheet
         this.PivotMeasure = null;
         this.PivotStaffIndex = null;
         this.SelectionMode = null;
+    }
+    
+    public enableInteraction(): void
+    {
+        for (let measure of this.MeasureList.flat(1))
+        {
+            (measure.getVFStave() as ImcorviseStave).enableInteraction();
+        }
+    }
+
+    public disableInteraction(): void
+    {
+        for (let measure of this.MeasureList.flat(1))
+        {
+            (measure.getVFStave() as ImcorviseStave).disableInteraction();
+        }
     }
 }
 

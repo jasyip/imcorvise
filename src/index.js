@@ -1,4 +1,5 @@
 import { Imcorvise } from "./Imcorvise/Imcorvise";
+import { ImcorviseGraphicalMusicSheet } from "./Graphical/ImcorviseGraphicalMusicSheet";
 //import { OpenSheetMusicDisplay } from "opensheetmusicdisplay";
 
 (function ()
@@ -6,35 +7,24 @@ import { Imcorvise } from "./Imcorvise/Imcorvise";
     let imcorvise;
     let imcorviseDiv;
 
+    function submit(event)
+    {
+        if (!imcorvise.GraphicSheet.SelectedMeasures
+            || !imcorvise.GraphicSheet.SelectedMeasures.some(s => s.size > 0))
+        {
+            alert("Select some measures first!");
+            return;
+        }
+        imcorvise.GraphicSheet.disableInteraction();
+    }
+
     function startImcorvise(text)
     {
         imcorvise.load(text);
         imcorvise.render();
-/*
-        let gs = imcorvise.GraphicSheet;
-        let measureList = gs.MeasureList;
-        let svgContainer = document.getElementById("osmdSvgPage1");
-        //typeof measure => GraphicalMeasure
-        measureList.forEach(function(measureCol, ind)
-        {
-            let measure = measureCol[0];
-            let color = ind % 2 === 0 ? "red" : "blue";
-          console.log(measure);
-            let rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-            let boundingBox = measure.boundingBox;
-            console.log(boundingBox);
-
-            let scale = 10.0;
-            rect.setAttributeNS(null, "x", boundingBox.absolutePosition.x * scale);
-            rect.setAttributeNS(null, "y", boundingBox.absolutePosition.y * scale);
-            rect.setAttributeNS(null, "height", boundingBox.size.height * scale);
-            rect.setAttributeNS(null, "width", boundingBox.size.width * scale);
-            rect.setAttributeNS(null, "fill", color);
-            rect.setAttributeNS(null, "opacity", 0.4);
-
-            svgContainer.appendChild(rect);
-        });
-*/
+        const submitButton = document.getElementById("submit");
+        submitButton.hidden = false;
+        submitButton.addEventListener("click", submit);
     }
    
     function loadFile()
@@ -53,7 +43,7 @@ import { Imcorvise } from "./Imcorvise/Imcorvise";
 
     function init()
     {
-        const input = document.querySelector("#input");
+        const input = document.getElementById("input");
         input.addEventListener("change", loadFile);
     }
 

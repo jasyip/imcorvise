@@ -101,6 +101,14 @@ export class ImcorviseStave extends Vex.Flow.Stave
             }
             sheet.resetSelection();
         }
+        else
+        {
+            for (let measure of sheet.MeasureList.flat(1))
+            {
+                ((measure as VexFlowMeasure).getVFStave() as ImcorviseStave).updateBox();
+            }
+        }
+        event.stopPropagation();
     }
 
     private onmouseenter(event): void
@@ -114,7 +122,6 @@ export class ImcorviseStave extends Vex.Flow.Stave
             measures: measures,
             measureNumber: measureNumber
         } = currentMeasure.ParentIMeasure.getData();
-        console.log(sheet.SelectionMode);
         if ([1, 2].includes(event.buttons & 0b00011) && sheet.PivotStaffIndex === staffIndex)
         { 
             (measures[sheet.PivotMeasure - 1] as ImcorviseMeasure).rangeTo(measureNumber);
@@ -137,10 +144,7 @@ export class ImcorviseStave extends Vex.Flow.Stave
             measureNumber: measureNumber
         } = currentMeasure.ParentIMeasure.getData();
 
-        if (![1, 2].includes(event.buttons & 0b00011) || sheet.PivotStaffIndex !== staffIndex)
-        {
-            currentMeasure.updateBox();
-        }
+        currentMeasure.updateBox();
     }
 
     public manualUpdate(selected: boolean): void
@@ -168,58 +172,20 @@ export class ImcorviseStave extends Vex.Flow.Stave
         }
     }
 
-    public draw(): void
-    {    
-        this.checkContext();
-        this.setRendered();
-
-        if (!this.formatted)
-        {
-            this.format();
-        }
-
-        const num_lines = this.options.num_lines;
-
-        // Render lines
-        for (let line = 0; line < num_lines; ++line)
-        {
-            let y = this.getYForLine(line);
-            this.applyStyle();
-            if (this.options.line_config[line].visible)
-            {
-                this.context.beginPath();
-                this.context.moveTo(this.x, y);
-                this.context.lineTo(this.x + this.width, y);
-                this.context.stroke();
-            }
-            this.restoreStyle();
-        }
-
-        if (![1, 2].includes(event.buttons & 0b00011) || sheet.PivotStaffIndex !== staffIndex)
-        {
-            currentMeasure.updateBox();
-        }
+    public enableInteraction(): void
+    {
+        this.boxElement.addEventListener("mousedown", this.onmousedown);
+        this.boxElement.addEventListener("mouseup", this.onmouseup);
+        this.boxElement.addEventListener("mouseenter", this.onmouseenter);
+        this.boxElement.addEventListener("mouseleave", this.onmouseleave);
     }
 
-    public manualUpdate(selected: boolean): void
+    public disableInteraction(): void
     {
-        const color: string = COLOR_STATE[+this.touched][+selected];
-        this.boxElement.style.stroke = color;
-        this.boxElement.style.fill = color;
-    }
-    
-    public updateBox(): void
-    {
-        const
-        {
-            sheet: sheet,
-            measureNumber: measureNumber,
-            staffIndex: staffIndex
-        } = this.parentIMeasure.getData();
-        if (sheet.SelectedMeasures)
-        {
-            this.manualUpdate(sheet.SelectedMeasures[staffIndex].has(measureNumber));
-        }
+        this.boxElement.removeEventListener("mousedown", this.onmousedown);
+        this.boxElement.removeEventListener("mouseup", this.onmouseup);
+        this.boxElement.removeEventListener("mouseenter", this.onmouseenter);
+        this.boxElement.removeEventListener("mouseleave", this.onmouseleave);
     }
 
     public draw(): void
@@ -275,11 +241,8 @@ export class ImcorviseStave extends Vex.Flow.Stave
             this.boxElement = this.context.svg.lastElementChild;
             this.boxElement.style.pointerEvents = "all";
             this.boxElement.style.fillOpacity = 0.3;
-            this.boxElement.onmousedown = this.onmousedown;
-            this.boxElement.onmouseup = this.onmouseup;
-            this.boxElement.onmouseenter = this.onmouseenter;
-            this.boxElement.onmouseleave = this.onmouseleave;
             this.boxElement.measure = this;
+            this.enableInteraction();
             this.manualUpdate(false);
         }
 

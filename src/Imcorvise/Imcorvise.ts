@@ -24,6 +24,8 @@ export class Imcorvise extends OpenSheetMusicDisplay
     public render(): void
     {
         super.render();
+        //this.container.addEventListener("mouseenter", e => e.preventDefault());
+        //this.container.addEventListener("mouseleave", e => e.preventDefault());
         this.container.style["pointer-events"] = "none";
         this.container.style["-webkit-touch-callout"] = "none";
         this.container.style["-webkit-user-select"] = "none";
