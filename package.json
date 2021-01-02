@@ -7,8 +7,9 @@
     },
     "scripts": {
         "dev": "node start-url.js && parcel src/index.html",
-        "build": "parcel build src/index.html",
-        "edit": "vim package.json"
+        "build": "parcel build src/index.html --out-dir build/",
+        "edit": "vim package.json",
+        "deploy": "npm run build && surge build https://imcorvise.surge.sh"
     },
     "author": "Jason Yip",
     "license": "MIT",
