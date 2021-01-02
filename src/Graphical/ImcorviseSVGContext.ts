@@ -3,7 +3,7 @@ import Vex from "vexflow";
 
 export class ImcorviseSVGContext extends Vex.Flow.SVGContext
 {
-    public rect
+    public rectWEvents
     (
         x: number,
         y: number,
