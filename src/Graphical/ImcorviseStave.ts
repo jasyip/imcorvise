@@ -88,7 +88,7 @@ export class ImcorviseStave extends Vex.Flow.Stave
         {
 
             for (let i = Math.min(sheet.PivotMeasure, measureNumber);
-                i <= Math.max(sheet.PivotMeasure, measureNumber); ++i) 
+                i <= Math.max(sheet.PivotMeasure, measureNumber); ++i)
             {
                 if (event.which === 1)
                 {

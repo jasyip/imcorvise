@@ -13,8 +13,13 @@
     },
     "author": "Jason Yip",
     "license": "MIT",
+    "exports": {
+        "./PointF2D": "./src/Common/DataObjects/index.js"
+    },
     "dependencies": {
+        "jspdf": "^2.2.0",
         "opensheetmusicdisplay": "^0.8.7",
+        "svg2pdf.js": "^2.1.0",
         "vexflow": "^3.0.9"
     },
     "devDependencies": {
