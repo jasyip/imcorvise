@@ -2,13 +2,11 @@ import
 {
     VexFlowMusicSheetCalculator,
     MusicSheetCalculator,
-    EngravingRules,
+    EngravingRules
 }
-    from "opensheetmusicdisplay";
-
+    from "osmd";
 
 import { ImcorviseGraphicalSymbolFactory } from "./ImcorviseGraphicalSymbolFactory";
-//import { ImcorviseMusicSystemBuilder } from "./ImcorviseMusicSystemBuilder";
 
 export class ImcorviseMusicSheetCalculator extends VexFlowMusicSheetCalculator
 {

@@ -6,9 +6,10 @@ import
     StaffLine,
     VexFlowMeasure
 }
-    from "opensheetmusicdisplay";
+    from "osmd";
 
-import { ImcorviseMeasure } from "./ImcorviseMeasure"
+import { ImcorviseMeasure } from "./ImcorviseMeasure";
+import { ImcorviseMultiRestMeasure } from "./ImcorviseMultiRestMeasure";
 
 export class ImcorviseGraphicalSymbolFactory extends VexFlowGraphicalSymbolFactory
 {
@@ -21,6 +22,17 @@ export class ImcorviseGraphicalSymbolFactory extends VexFlowGraphicalSymbolFacto
     : GraphicalMeasure
     {
         return new ImcorviseMeasure(staff, sourceMeasure, undefined);
+    }
+
+    public createMultiRestMeasure
+    (
+        sourceMeasure: SourceMeasure,
+        staff: Staff,
+        staffLine?: StaffLine
+    )
+    : GraphicMeasure
+    {
+        return new ImcorviseMultiRestMeasure(staff, sourceMeasure, staffLine);
     }
 
     public createExtraGraphicalMeasure(staffLine: StaffLine): GraphicalMeasure

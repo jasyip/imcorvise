@@ -1,6 +1,6 @@
 import { Imcorvise } from "./Imcorvise/Imcorvise";
 import { ImcorviseGraphicalMusicSheet } from "./Graphical/ImcorviseGraphicalMusicSheet";
-import { BackendType } from "opensheetmusicdisplay";
+import { BackendType } from "osmd";
 import { jsPDF } from "jspdf";
 import "svg2pdf.js";
 
@@ -48,7 +48,6 @@ import "svg2pdf.js";
         {
             pageHeight = pageWidth * svgElement.clientHeight / svgElement.clientWidth;
         }
-        console.log(pageWidth, pageHeight);
         const orientation = pageHeight > pageWidth ? "p" : "l";
         // create a new jsPDF instance
         const pdf = new jsPDF({
@@ -82,7 +81,7 @@ import "svg2pdf.js";
         imcorvise.modify();
         imcorviseDiv.innerHTML = "";
         imcorvise.updateGraphic();
-        imcorvise.render()
+        imcorvise.render();
         imcorvise.disableInteraction();
         directions.innerHTML = "Done!";
         downloadButton.hidden = false;

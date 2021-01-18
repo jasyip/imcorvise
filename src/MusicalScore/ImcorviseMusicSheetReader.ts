@@ -10,7 +10,7 @@ import
     IAfterSheetReadingModule,
     Fraction
 }
-    from "opensheetmusicdisplay";
+    from "osmd";
 
 import log from "loglevel";
 

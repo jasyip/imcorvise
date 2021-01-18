@@ -8,17 +8,16 @@
     "scripts": {
         "dev": "node start-url.js && parcel src/index.html",
         "build": "parcel build src/index.html --out-dir build/",
+        "watch": "parcel watch src/index.html --out-dir build/",
         "edit": "vim package.json",
         "deploy": "npm run build && surge build https://imcorvise.surge.sh"
     },
     "author": "Jason Yip",
     "license": "MIT",
-    "exports": {
-        "./PointF2D": "./src/Common/DataObjects/index.js"
-    },
     "dependencies": {
         "jspdf": "^2.2.0",
-        "opensheetmusicdisplay": "^0.8.7",
+        "opensheetmusicdisplay": "git+https://github.com/opensheetmusicdisplay/opensheetmusicdisplay.git",
+        "osmd": "git://github.com/opensheetmusicdisplay/opensheetmusicdisplay.git",
         "svg2pdf.js": "^2.1.0",
         "vexflow": "^3.0.9"
     },

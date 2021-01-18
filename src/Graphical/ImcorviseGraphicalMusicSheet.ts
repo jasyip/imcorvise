@@ -3,7 +3,7 @@ import
     GraphicalMusicSheet,
     GraphicalMeasure
 }
-    from "opensheetmusicdisplay";
+    from "osmd";
 
 import { ImcorviseStave } from "./ImcorviseStave";
 
@@ -31,7 +31,10 @@ export class ImcorviseGraphicalMusicSheet extends GraphicalMusicSheet
     {
         for (let measure of this.MeasureList.flat(1))
         {
-            (measure.getVFStave() as ImcorviseStave).enableInteraction();
+            if (measure)
+            {
+                (measure.getVFStave() as ImcorviseStave).disableInteraction();
+            }
         }
     }
 
@@ -39,7 +42,10 @@ export class ImcorviseGraphicalMusicSheet extends GraphicalMusicSheet
     {
         for (let measure of this.MeasureList.flat(1))
         {
-            (measure.getVFStave() as ImcorviseStave).disableInteraction();
+            if (measure)
+            {
+                (measure.getVFStave() as ImcorviseStave).disableInteraction();
+            }
         }
     }
 }

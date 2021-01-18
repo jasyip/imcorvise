@@ -6,7 +6,7 @@ import
     GraphicalMusicSheet,
     MXLHelper
 }
-    from "opensheetmusicdisplay";
+    from "osmd";
 
 import log from "loglevel";
 

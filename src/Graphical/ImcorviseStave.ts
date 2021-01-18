@@ -6,19 +6,11 @@ import
     MusicSystem,
     GraphicalMeasure
 }
-    from "opensheetmusicdisplay";
+    from "osmd";
 
-import { ImcorviseGraphicalMusicSheet, SelectionMode } from "./ImcorviseGraphicalMusicSheet"
+import { MeasureInterface } from "./MeasureInterface";
+import { ImcorviseGraphicalMusicSheet, SelectionMode } from "./ImcorviseGraphicalMusicSheet";
 import { ImcorviseMeasure } from "./ImcorviseMeasure";
-
-
-const COLOR_STATE: string[][] =
-[
-    //untouched and unselected, touched and unselected
-    ["none", "#444444"],
-    //untouched and selected, touched and selected,
-    ["#7FBFFF", "#666699"]
-];
 
 
 export class ImcorviseStave extends Vex.Flow.Stave
@@ -28,9 +20,17 @@ export class ImcorviseStave extends Vex.Flow.Stave
     private readonly boxElement: SVGSVGElement;
     private readonly parentIMeasure: ImcorviseMeasure;
 
+    private readonly static COLOR_STATE: string[][] =
+    [
+        //untouched and unselected, touched and unselected
+        ["none", "#444444"],
+        //untouched and selected, touched and selected,
+        ["#7FBFFF", "#666699"]
+    ];
+
     constructor
     (
-        parentIMeasure: ImcorviseMeasure,
+        parentIMeasure: MeasureInterface,
         x: number,
         y: number,
         width: number,
@@ -149,7 +149,7 @@ export class ImcorviseStave extends Vex.Flow.Stave
 
     public manualUpdate(selected: boolean): void
     {
-        const color: string = COLOR_STATE[+this.touched][+selected];
+        const color: string = ImcorviseStave.COLOR_STATE[+this.touched][+selected];
         this.boxElement.style.stroke = color;
         this.boxElement.style.fill = color;
     }

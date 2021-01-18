@@ -1,22 +1,22 @@
 import
 {
     VexFlowMeasure,
-    Staff,
-    SourceMeasure,
-    StaffLine,
+    VexFlowMultiRestMeasure,
     SystemLinesEnum
 }
     from "osmd";
+
 
 import Vex from "vexflow";
 
 import { MeasureInterface } from "./MeasureInterface";
 import { ImcorviseStave } from "./ImcorviseStave";
-import { ImcorviseGraphicalMusicSheet, SelectionMode } from "./ImcorviseGraphicalMusicSheet"
+import { ImcorviseGraphicalMusicSheet, SelectionMode } from "./ImcorviseGraphicalMusicSheet";
 
-
-export class ImcorviseMeasure extends VexFlowMeasure implements MeasureInterface
+export class ImcorviseMultiRestMeasure extends VexFlowMultiRestMeasure
+    implements MeasureInterface
 {
+
     public resetLayout(): void
     {
         this.stave = new ImcorviseStave(this, 0, 0, 0, {
