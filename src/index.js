@@ -122,7 +122,8 @@ import "svg2pdf.js";
         submitButton = document.getElementById("submit");
         downloadButton = document.getElementById("download");
         directions = document.getElementById("directions");
-        directions.innerHTML = "Upload a MusicXML file to get started!"
+        directions.hidden = false;
+        input.hidden = false;
         input.addEventListener("change", loadFile);
     }
 
