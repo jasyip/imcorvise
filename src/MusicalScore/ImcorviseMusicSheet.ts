@@ -10,12 +10,14 @@ import
     Pitch,
     Fraction,
     SourceStaffEntry,
-    VerticalSourceStaffEntryContainer
+    VerticalSourceStaffEntryContainer,
+    KeyInstruction
 }
     from "osmd";
 
 import { KrumhanslSchmuckler } from "./KrumhanslSchmuckler";
 import { ChordToNotes } from "./ChordToNotes";
+
 
 export class ImcorviseMusicSheet extends MusicSheet
 {
@@ -29,9 +31,10 @@ export class ImcorviseMusicSheet extends MusicSheet
         this.chords = new Map();
         //k: source measure, v: array of number arrays of len 12
         this.specificLengths = new Map();
-        //totalLengths.forEach(item => item = new Array(12).fill(0.0));
         //k: source measure, v: array of sets of numbers
         this.uniquePitches = new Map();
+        //k: source measure, v: array of keyinstructions
+        this.keySignatures = new Map();
     }
 
     private selectedMeasures: Map;
@@ -39,7 +42,9 @@ export class ImcorviseMusicSheet extends MusicSheet
     private specificLengths: Map;
     private totalLengths: number[][];
     private uniquePitches: Map;
+    private keySignatures: Map;
     private staves: Staff[];
+    
 
     private static generateNote
     (
@@ -53,7 +58,8 @@ export class ImcorviseMusicSheet extends MusicSheet
     )
     : void 
     {
-        let addChord: boolean = measure.VerticalSourceStaffEntryContainers.length === 0;
+        let addChord: boolean = measure.VerticalSourceStaffEntryContainers.length === 0 &&
+            timestamp.Equals(new Fraction());
         const staffEntry = measure.findOrCreateStaffEntry(timestamp, 0, staff).staffEntry;
         const voiceEntry = measure.findOrCreateVoiceEntry(staffEntry, staff.Voices[0]).voiceEntry;
         const note = new Note(voiceEntry, staffEntry, duration, pitch, measure, isRest);
@@ -113,18 +119,31 @@ export class ImcorviseMusicSheet extends MusicSheet
         }
     }
 
+    private getKeyInstruction(measure: SourceMeasure, staffInd: number): KeyInstruction
+    {
+        let previousMeasure = measure;
+        while (previousMeasure)
+        {
+            const out: KeyInstruction = previousMeasure.getKeyInstruction(staffInd);
+            if (out)
+            {
+                return out;
+            }
+            previousMeasure = this.SourceMeasures[previousMeasure.measureListIndex - 1];
+        }
+        return undefined;
+    }
+
     private modifyMeasure
     (
-        staff: Staff,
+        staffInd: number,
         measure: SourceMeasure,
         chord: ChordSymbolContainer,
         preferSharps: boolean = true,
     )
     : void
     {
-        //console.log(measure.MeasureNumber, measure.VerticalSourceStaffEntryContainers);
-        measure.VerticalSourceStaffEntryContainers.splice(0,
-            measure.VerticalSourceStaffEntryContainers.length);
+        measure.VerticalSourceStaffEntryContainers.length = 0;
 
         const chordInts: number[] = ChordToNotes.getInts(chord);
         const majorInts: number[] = [0, 2, 4, 5, 7, 9, 11];
@@ -174,8 +193,9 @@ export class ImcorviseMusicSheet extends MusicSheet
         {
             if (accidentals[i])
             {
-                ImcorviseMusicSheet.addRest(chord, staff, out, measure, curPos, curRestDur);
-                out.push(ImcorviseMusicSheet.generateNote(chord, staff, measure,
+                ImcorviseMusicSheet.addRest(
+                    chord, this.staves[staffInd], out, measure, curPos, curRestDur);
+                out.push(ImcorviseMusicSheet.generateNote(chord, this.staves[staffInd], measure,
                     curPos.clone(), new Fraction(1, 8),
                     new Pitch(majorInts[i], i < 3 ? 2 : 1,
                     Pitch.AccidentalFromHalfTones(accidentals[i])), false));
@@ -187,7 +207,9 @@ export class ImcorviseMusicSheet extends MusicSheet
             }
         }
         curRestDur.Add(new Fraction(1, 8));
-        ImcorviseMusicSheet.addRest(chord, staff, out, measure, curPos, curRestDur);
+        ImcorviseMusicSheet.addRest(
+            chord, this.staves[staffInd], out, measure, curPos, curRestDur);
+
     }
 
     public getChords(measure: SourceMeasure): ChordSymbolContainer[]
@@ -202,9 +224,117 @@ export class ImcorviseMusicSheet extends MusicSheet
                     return Array.from(entrySet);
                 }
             }
-            previousMeasure = this.SourceMeasures[measure.MeasureNumber - 2];
+            previousMeasure = this.SourceMeasures[previousMeasure.measureListIndex - 1];
         }
         return new Array(0);
+    }
+
+    private static del(staffInd: number, ...measures: SourceMeasure[]): void
+    {
+        for (const measure of measures)
+        {
+            measure.FirstInstructionsStaffEntries[staffInd].
+                removeFirstInstructionOfTypeKeyInstruction();
+        }
+    }
+    private static replace(staffInd: number, ...measures: SourceMeasure[]): void
+    {
+        for (const measure of measures)
+        {
+            measure.FirstInstructionsStaffEntries[staffInd].Instructions.splice(
+                measure.FirstInstructionsStaffEntries[staffInd].Instructions.
+                findIndex(e => e instanceof KeyInstruction), 1, new KeyInstruction());
+        }
+    }
+    private static add(staffInd: number, measure: SourceMeasure, key: KeyInstruction): void
+    {
+        if (!measure.hasBeginInstructions())
+        {
+            measure.FirstInstructionsStaffEntries[staffInd] = new SourceStaffEntry(
+                undefined, undefined);
+        }
+        measure.FirstInstructionsStaffEntries[staffInd].Instructions.push(
+            KeyInstruction.copy(key));
+    }
+
+
+    private changeKS(measure: SourceMeasure, staffInd: number): void
+    {
+        const prevMeasure: SourceMeasure = this.SourceMeasures[measure.measureListIndex - 1];
+        const nextMeasure: SourceMeasure = this.SourceMeasures[measure.measureListIndex + 1];
+
+        const prevKey: KeyInstruction = this.getKeyInstruction(prevMeasure, staffInd);
+        const curKey: KeyInstruction = this.getKeyInstruction(measure, staffInd);
+        const nextKey: KeyInstruction = this.getKeyInstruction(nextMeasure, staffInd);
+
+        const prevC: boolean = (prevKey === undefined) ? false :
+            (prevKey.AlteratedNotes.length === 0);
+        const curC: boolean = curKey.AlteratedNotes.length === 0;
+        const nextC: boolean = (nextKey === undefined) ? false :
+            (nextKey.AlteratedNotes.length === 0);
+        const curNew: boolean = measure.getKeyInstruction(staffInd) !== undefined;
+        const nextNew: boolean = nextMeasure.getKeyInstruction(staffInd) !== undefined;
+        
+        if (prevC)
+        {
+            if (curNew && !curC && nextNew && nextC)
+            {
+                ImcorviseMusicSheet.del(staffInd, measure, nextMeasure);
+            }
+            else if (curNew && !curC && nextNew && !nextC)
+            {
+                ImcorviseMusicSheet.del(staffInd, measure);
+            }
+            else if (curNew && !curC && !nextNew && !nextC)
+            {
+                ImcorviseMusicSheet.del(staffInd, measure);
+                if (nextMeasure)
+                {
+                    ImcorviseMusicSheet.add(staffInd, nextMeasure, nextKey);
+                }
+            }
+        }
+        else
+        {
+            if (curNew && !curC && nextNew && nextC)
+            {
+                ImcorviseMusicSheet.replace(staffInd, measure);
+                ImcorviseMusicSheet.del(staffInd, nextMeasure);
+            }
+            else if (!curNew && !curC && nextNew && nextC)
+            {
+                ImcorviseMusicSheet.add(staffInd, measure, new KeyInstruction());
+                ImcorviseMusicSheet.del(staffInd, nextMeasure);
+            }
+            else if (curNew && !curC && !nextNew && nextC)
+            {
+                ImcorviseMusicSheet.replace(staffInd, measure);
+            }
+            else if (curNew && !curC && nextNew && !nextC)
+            {
+                ImcorviseMusicSheet.replace(staffInd, measure);
+            }
+            else if (!curNew && !curC && nextNew && !nextC)
+            {
+                ImcorviseMusicSheet.add(staffInd, measure, newKeyInstruction);
+            }
+            else if (curNew && !curC && !nextNew && !nextC)
+            {
+                ImcorviseMusicSheet.replace(staffInd, measure);
+                if (nextMeasure)
+                {
+                    ImcorviseMusicSheet.add(staffInd, nextMeasure, nextKey);
+                }
+            }
+            else if (!curNew && !curC && !nextNew && !nextC)
+            {
+                ImcorviseMusicSheet.add(staffInd, measure, new KeyInstruction());
+                if (nextMeasure)
+                {
+                    ImcorviseMusicSheet.add(staffInd, nextMeasure, nextKey);
+                }
+            }
+        }
     }
 
     public modify(measureInds: number[][]): boolean
@@ -241,8 +371,6 @@ export class ImcorviseMusicSheet extends MusicSheet
         {
             for (let voice: Voice of this.staves[staveInd].Voices)
             {
-                let indsToDel: Set = new Set();
-                let VEInd: number = 0;
                 for (let voiceEntry: VoiceEntry of voice.VoiceEntries)
                 {
                     for (let note: Note of voiceEntry.Notes)
@@ -258,7 +386,20 @@ export class ImcorviseMusicSheet extends MusicSheet
                             voiceEntry.ParentSourceStaffEntry.ChordContainers.
                                 forEach(chord => this.chords.get(note.SourceMeasure).add(chord));
                         }
-
+                        if (this.selectedMeasures.get(note.SourceMeasure) &&
+                            this.selectedMeasures.get(note.SourceMeasure).includes(staveInd))
+                        {
+                            if (!this.keySignatures.has(note.SourceMeasure))
+                            {
+                                this.keySignatures.set(note.SourceMeasure,
+                                    new Array(this.staves.length));
+                            }
+                            if (!this.keySignatures.get(note.SourceMeasure).some(e => e))
+                            {
+                                this.keySignatures.get(note.SourceMeasure)[staveInd] =
+                                    this.getKeyInstruction(note.SourceMeasure);
+                            }
+                        }
                         if (!note.isRest())
                         {
                             const length: number = note.Length.RealValue;
@@ -271,7 +412,6 @@ export class ImcorviseMusicSheet extends MusicSheet
                             if (this.selectedMeasures.get(note.SourceMeasure) &&
                                 this.selectedMeasures.get(note.SourceMeasure).includes(staveInd))
                             {
-                                indsToDel.add(VEInd);
                                 if (!this.specificLengths.has(note.SourceMeasure))
                                 {
                                     const arr = new Array(this.staves.length);
@@ -302,15 +442,7 @@ export class ImcorviseMusicSheet extends MusicSheet
                             }
                         }
                     }
-                    ++VEInd;
                 }
-/*
-                indsToDel = Array.from(indsToDel).sort((a, b) => b - a);
-                for (const ind: number of indsToDel)
-                {
-                    voice.VoiceEntries.splice(ind, 1);
-                }
-*/
             }
         }
         let chordsOfSheet: ChordSymbolContainer[] = new Array(this.staves.length);
@@ -318,13 +450,15 @@ export class ImcorviseMusicSheet extends MusicSheet
         {
             chordsOfSheet[tempInd] = KrumhanslSchmuckler.getChord(this.totalLengths[tempInd]);
         }
-        for (let [measure, inds] of this.selectedMeasures.entries())
+        for (let [measure, inds] of Array.from(this.selectedMeasures.entries()).sort(
+            (a, b) => a[0].MeasureNumber - b[0].MeasureNumber))
         {
             const measureChords: ChordSymbolContainer[] = this.getChords(measure);
                 // need to guess using krumahsnl-schmuckler on
                 // measure's notes if it has 2+ notes or entire piece
             for (let staveInd: number of inds)
             {
+                this.changeKS(measure, staveInd);
                 if (measureChords.length === 0)
                 {
                     let chord: ChordSymbolContainer;
@@ -338,15 +472,15 @@ export class ImcorviseMusicSheet extends MusicSheet
                     {
                         chord = chordsOfSheet[staveInd];
                     }
-                    this.modifyMeasure(this.staves[staveInd], measure, chord);
+                    this.modifyMeasure(staveInd, measure, chord);
                 }
                 else
                 {
-                    this.modifyMeasure(
-                        this.staves[staveInd], measure, measureChords[0]);
+                    this.modifyMeasure(staveInd, measure, measureChords[0]);
                 }
             }
         }
+
     }
 
 }

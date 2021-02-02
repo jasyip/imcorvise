@@ -107,7 +107,8 @@ import "svg2pdf.js";
         if (file)
         {
             imcorviseDiv = document.createElement("div");
-            imcorvise = new Imcorvise(imcorviseDiv);
+            imcorvise = new Imcorvise(imcorviseDiv, {
+                autoGenerateMultipleRestMeasuresFromRestMeasures : false });
             imcorvise.setLogLevel("info");
             document.body.appendChild(imcorviseDiv);
             directions.innerHTML = "Your MusicXML file is being read at the moment. "
