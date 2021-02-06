@@ -4,7 +4,11 @@ import
     MusicSheetCalculator,
     IXmlElement,
     GraphicalMusicSheet,
-    MXLHelper
+    MXLHelper,
+    BackendType,
+    GraphicalMusicPage,
+    VexFlowBackend,
+    CanvasVexFlowBackend
 }
     from "osmd";
 
@@ -13,6 +17,7 @@ import log from "loglevel";
 import { ImcorviseMusicSheetCalculator } from "../Graphical/ImcorviseMusicSheetCalculator";
 import { ImcorviseMusicSheetReader } from "../MusicalScore/ImcorviseMusicSheetReader";
 import { ImcorviseGraphicalMusicSheet } from "../Graphical/ImcorviseGraphicalMusicSheet";
+import { ImcorviseSVGBackend } from "../Graphical/ImcorviseSVGBackend";
 
 export class Imcorvise extends OpenSheetMusicDisplay
 {
@@ -145,6 +150,21 @@ export class Imcorvise extends OpenSheetMusicDisplay
         this.container.style["-ms-user-select"] = "none";
         this.container.style["user-select"] = "none";
         this.container.addEventListener("contextmenu", e => e.preventDefault());
+    }
+
+    public createBackend(type: BackendType, page: GraphicalMusicPage): VexFlowBackend
+    {
+        
+        let backend: VexFlowBackend;
+        if (type === undefined || type === BackendType.SVG) {
+            backend = new ImcorviseSVGBackend(this.rules);
+        } else {
+            backend = new CanvasVexFlowBackend(this.rules);
+        }
+        backend.graphicalMusicPage = page; // the page the backend renders on. needed to identify DOM element to extract image/SVG
+        backend.initialize(this.container, this.zoom);
+        return backend;
+
     }
 
     public disableInteraction(): void

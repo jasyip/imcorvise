@@ -16,7 +16,6 @@
     "license": "MIT",
     "dependencies": {
         "jspdf": "^2.2.0",
-        "opensheetmusicdisplay": "git+https://github.com/opensheetmusicdisplay/opensheetmusicdisplay.git",
         "osmd": "git://github.com/opensheetmusicdisplay/opensheetmusicdisplay.git",
         "svg2pdf.js": "^2.1.0",
         "vexflow": "^3.0.9"

@@ -6,7 +6,7 @@ import
     EngravingRules,
     Pitch
 }
-    from "opensheetmusicdisplay";
+    from "osmd";
 
 export class KrumhanslSchmuckler
 {

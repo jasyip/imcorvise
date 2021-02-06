@@ -8,7 +8,7 @@ import
     SourceStaffEntry,
     SourceMeasure
 }
-    from "opensheetmusicdisplay";
+    from "osmd";
 
 
 export class ChordToNotes
