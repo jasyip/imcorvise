@@ -7,7 +7,7 @@ export class ImcorviseRenderer extends Vex.Flow.Renderer
     constructor(elementId: string, backend: number)
     {
         super(elementId, backend);
-        if (this.backend === Renderer.Backends.SVG)
+        if (this.backend === Vex.Flow.Renderer.Backends.SVG)
         {
             this.ctx = new ImcorviseSVGContext(this.element);
         }
@@ -35,7 +35,7 @@ export class ImcorviseRenderer extends Vex.Flow.Renderer
         }
         const ctx = renderer.getContext();
         ctx.setBackgroundFillStyle(background);
-        Renderer.lastContext = ctx;
+        Vex.Flow.Renderer.lastContext = ctx;
         return ctx;
     }
 }

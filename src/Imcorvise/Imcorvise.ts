@@ -140,28 +140,46 @@ export class Imcorvise extends OpenSheetMusicDisplay
     public render(): void
     {
         super.render();
-        //this.container.addEventListener("mouseenter", e => e.preventDefault());
-        //this.container.addEventListener("mouseleave", e => e.preventDefault());
-        this.container.style["pointer-events"] = "none";
+
+        const graphic: ImcorviseGraphicalMusicSheet =
+            this.GraphicSheet as ImcorviseGraphicalMusicSheet;
+
+        //this.container.style["pointer-events"] = "none";
         this.container.style["-webkit-touch-callout"] = "none";
         this.container.style["-webkit-user-select"] = "none";
         this.container.style["-khtml-user-select"] = "none";
         this.container.style["-moz-user-select"] = "none";
         this.container.style["-ms-user-select"] = "none";
         this.container.style["user-select"] = "none";
+        this.container.addEventListener("click", e => e.preventDefault());
         this.container.addEventListener("contextmenu", e => e.preventDefault());
+        this.container.addEventListener("dblclick", e => e.preventDefault());
+        this.container.addEventListener("mousedown", e => e.preventDefault());
+        this.container.addEventListener("mouseenter", e => e.preventDefault());
+        this.container.addEventListener("mouseleave", e => e.preventDefault());
+        this.container.addEventListener("mouseout", e => e.preventDefault());
+        this.container.addEventListener("mouseover", e => e.preventDefault());
+        this.container.addEventListener("mouseup", function (e)
+        {
+            e.preventDefault();
+            graphic.forceUpdate();
+        });
     }
 
     public createBackend(type: BackendType, page: GraphicalMusicPage): VexFlowBackend
     {
         
         let backend: VexFlowBackend;
-        if (type === undefined || type === BackendType.SVG) {
+        if (type === undefined || type === BackendType.SVG)
+        {
             backend = new ImcorviseSVGBackend(this.rules);
-        } else {
+        }
+        else
+        {
             backend = new CanvasVexFlowBackend(this.rules);
         }
-        backend.graphicalMusicPage = page; // the page the backend renders on. needed to identify DOM element to extract image/SVG
+        // the page the backend renders on. needed to identify DOM element to extract image/SVG
+        backend.graphicalMusicPage = page; 
         backend.initialize(this.container, this.zoom);
         return backend;
 
@@ -169,7 +187,7 @@ export class Imcorvise extends OpenSheetMusicDisplay
 
     public disableInteraction(): void
     {
-        this.GraphicSheet.disableInteraction();
+        (this.GraphicSheet as ImcorviseGraphicalMusicSheet).disableInteraction();
     }
 
     public modify(): void

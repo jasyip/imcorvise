@@ -26,6 +26,13 @@ export class ImcorviseGraphicalMusicSheet extends GraphicalMusicSheet
         this.PivotStaffIndex = null;
         this.SelectionMode = null;
     }
+
+    public forceUpdate(): void
+    {
+        const measureList = this.MeasureList.flat(1);
+        (measureList[0] as ImcorviseMeasure).rangeTo(
+            measureList[measureList.length - 1] as ImcorviseMeasure);
+    }
     
     public enableInteraction(): void
     {
@@ -33,7 +40,7 @@ export class ImcorviseGraphicalMusicSheet extends GraphicalMusicSheet
         {
             if (measure)
             {
-                (measure.getVFStave() as ImcorviseStave).disableInteraction();
+                (measure.getVFStave() as ImcorviseStave).enableInteraction();
             }
         }
     }

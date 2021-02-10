@@ -1,6 +1,8 @@
 import Vex from "vexflow";
 
-export class ImcorviseSVGContext extends Vex.Flow.SVGContext
+import { SVGContext } from "vexflow/src/svgcontext";
+
+export class ImcorviseSVGContext extends SVGContext
 { 
     public openGroup(cls: string, id: string, attrs) : HTMLElement
     {
@@ -17,6 +19,13 @@ export class ImcorviseSVGContext extends Vex.Flow.SVGContext
             group.setAttribute('id', Vex.Prefix(id));
         }
         return group;
+    }
+
+    public create(svgElementType: string): SVGSVGElement
+    {
+        let element = document.createElementNS(this.svgNS, svgElementType);
+        element.setAttribute("pointer-events", "none");
+        return element;
     }
 
 }
