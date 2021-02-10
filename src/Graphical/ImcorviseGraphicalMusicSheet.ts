@@ -29,9 +29,13 @@ export class ImcorviseGraphicalMusicSheet extends GraphicalMusicSheet
 
     public forceUpdate(): void
     {
-        const measureList = this.MeasureList.flat(1);
-        (measureList[0] as ImcorviseMeasure).rangeTo(
-            measureList[measureList.length - 1] as ImcorviseMeasure);
+        for (let measure of this.MeasureList.flat(1))
+        {
+            if (measure)
+            {
+                ((measure as ImcorviseMeasure).getVFStave() as ImcorviseStave).updateBox();
+            }
+        }
     }
     
     public enableInteraction(): void

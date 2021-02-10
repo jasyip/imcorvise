@@ -105,7 +105,10 @@ export class ImcorviseStave extends Vex.Flow.Stave
         {
             for (let measure of sheet.MeasureList.flat(1))
             {
-                ((measure as VexFlowMeasure).getVFStave() as ImcorviseStave).updateBox();
+                if (measure)
+                {
+                    ((measure as VexFlowMeasure).getVFStave() as ImcorviseStave).updateBox();
+                }
             }
         }
         event.stopPropagation();

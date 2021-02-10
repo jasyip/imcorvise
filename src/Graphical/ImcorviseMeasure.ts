@@ -74,19 +74,14 @@ export class ImcorviseMeasure extends VexFlowMeasure implements MeasureInterface
         }
         if (sheet.PivotStaffIndex === staffIndex)
         {
-            for (let measure of measures)
+            sheet.forceUpdate();
+
+            for (let measure of measures.slice(Math.min(firstIndex, secondIndex) - 1,
+                Math.max(firstIndex, secondIndex) - 1))
             {
                 if (measure)
                 {
-                    ((measure as VexFlowMeasure).getVFStave() as ImcorviseStave).updateBox();
-                }
-            }
-            for (let i = Math.min(firstIndex, secondIndex) - 1;
-                i <= Math.max(firstIndex, secondIndex) - 1; ++i)
-            {
-                if (measures[i])
-                {
-                    ((measures[i] as VexFlowMeasure).getVFStave() as ImcorviseStave).
+                    ((measure as VexFlowMeasure).getVFStave() as ImcorviseStave).
                         manualUpdate(sheet.SelectionMode === SelectionMode.ADD);
                 }
             }
