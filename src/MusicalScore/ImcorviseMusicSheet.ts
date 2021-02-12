@@ -46,10 +46,10 @@ export class ImcorviseMusicSheet extends MusicSheet
     private staves: Staff[];
     
 
-    private static generateNote
+    private generateNote
     (
         chord: ChordSymbolContainer,
-        staff: Staff,
+        staffInd: number,
         measure: SourceMeasure,
         timestamp: Fraction,
         duration: Fraction,
@@ -58,10 +58,23 @@ export class ImcorviseMusicSheet extends MusicSheet
     )
     : void 
     {
-        let addChord: boolean = measure.VerticalSourceStaffEntryContainers.length === 0 &&
-            timestamp.Equals(new Fraction());
-        const staffEntry = measure.findOrCreateStaffEntry(timestamp, 0, staff).staffEntry;
-        const voiceEntry = measure.findOrCreateVoiceEntry(staffEntry, staff.Voices[0]).voiceEntry;
+        let addChord: boolean = measure.VerticalSourceStaffEntryContainers.length === 0;
+        if (!addChord)
+        {
+            addChord = true;
+            for (let vssec of measure.VerticalSourceStaffEntryContainers)
+            {
+                if (vssec.StaffEntries[staffInd])
+                {
+                    addChord = false;
+                    break;
+                }
+            }
+        }
+        const staffEntry = measure.findOrCreateStaffEntry(
+            timestamp, 0, this.staves[staffInd]).staffEntry;
+        const voiceEntry = measure.findOrCreateVoiceEntry(
+            staffEntry, this.staves[staffInd].Voices[0]).voiceEntry;
         const note = new Note(voiceEntry, staffEntry, duration, pitch, measure, isRest);
         voiceEntry.Notes.push(note);
         if (addChord)
@@ -84,11 +97,10 @@ export class ImcorviseMusicSheet extends MusicSheet
         return out;
     }
 
-    private static addRest
+    private addRest
     (
         chord: ChordSymbolContainer,
-        staff: Staff,
-        out: Note[],
+        staffInd: number,
         measure: SourceMeasure,
         curPos: Fraction,
         curRestDur: Fraction
@@ -98,10 +110,11 @@ export class ImcorviseMusicSheet extends MusicSheet
         let added: number = 0;
         for (let i = 8; i >= 1; i >>= 1)
         {
-            if (curPos.Denominator === i && curRestDur.Numerator > 0 && curRestDur.Denominator === i)
+            if (curPos.Denominator === i && curRestDur.Numerator > 0
+                && curRestDur.Denominator === i)
             {
-                out.push(ImcorviseMusicSheet.generateNote(chord, staff, measure, curPos.clone(),
-                    new Fraction(1, i), undefined, true))
+                this.generateNote(chord, staffInd, measure, curPos.clone(),
+                    new Fraction(1, i), undefined, true);
                 added |= i;
                 curPos.Add(new Fraction(1, i));
                 curRestDur.Sub(new Fraction(1, i));
@@ -111,8 +124,8 @@ export class ImcorviseMusicSheet extends MusicSheet
         {
             if (!(added & i) && curRestDur.gte(new Fraction(1, i)))
             {
-                out.push(ImcorviseMusicSheet.generateNote(chord, staff, measure, curPos.clone(),
-                    new Fraction(1, i), undefined, true));
+                this.generateNote(chord, staffInd, measure, curPos.clone(),
+                    new Fraction(1, i), undefined, true);
                 curPos.Add(new Fraction(1, i));
                 curRestDur.Sub(new Fraction(1, i));
             }
@@ -143,8 +156,15 @@ export class ImcorviseMusicSheet extends MusicSheet
     )
     : void
     {
-        measure.VerticalSourceStaffEntryContainers.length = 0;
-
+        for (let i = measure.VerticalSourceStaffEntryContainers.length; --i >= 0; )
+        {
+            let vssecs = measure.VerticalSourceStaffEntryContainers[i];
+            vssecs.StaffEntries[staffInd] = undefined;
+            if (vssecs.StaffEntries.every(e => e === undefined))
+            {
+                measure.VerticalSourceStaffEntryContainers.splice(i, 1);
+            }
+        }
         const chordInts: number[] = ChordToNotes.getInts(chord);
         const majorInts: number[] = [0, 2, 4, 5, 7, 9, 11];
         const scaleInts: number[] = chordInts[2] === 3 ? [0, 2, 3, 5, 7, 8, 10] : majorInts;
@@ -186,19 +206,17 @@ export class ImcorviseMusicSheet extends MusicSheet
             }
         }
 
-        let out: Note[] = new Array(0)
         let curRestDur: Fraction = new Fraction();
         let curPos: Fraction = new Fraction();
         for (let i = 0; i < scaleInts.length; ++i)
         {
             if (accidentals[i])
             {
-                ImcorviseMusicSheet.addRest(
-                    chord, this.staves[staffInd], out, measure, curPos, curRestDur);
-                out.push(ImcorviseMusicSheet.generateNote(chord, this.staves[staffInd], measure,
+                this.addRest(chord, staffInd, measure, curPos, curRestDur);
+                this.generateNote(chord, staffInd, measure,
                     curPos.clone(), new Fraction(1, 8),
                     new Pitch(majorInts[i], i < 3 ? 2 : 1,
-                    Pitch.AccidentalFromHalfTones(accidentals[i])), false));
+                    Pitch.AccidentalFromHalfTones(accidentals[i])), false);
                 curPos.Add(new Fraction(1, 8));
             }
             else
@@ -207,8 +225,7 @@ export class ImcorviseMusicSheet extends MusicSheet
             }
         }
         curRestDur.Add(new Fraction(1, 8));
-        ImcorviseMusicSheet.addRest(
-            chord, this.staves[staffInd], out, measure, curPos, curRestDur);
+        this.addRest(chord, staffInd, measure, curPos, curRestDur);
 
     }
 
