@@ -58,26 +58,14 @@ export class ImcorviseMusicSheet extends MusicSheet
     )
     : void 
     {
-        let addChord: boolean = measure.VerticalSourceStaffEntryContainers.length === 0;
-        if (!addChord)
-        {
-            addChord = true;
-            for (let vssec of measure.VerticalSourceStaffEntryContainers)
-            {
-                if (vssec.StaffEntries[staffInd])
-                {
-                    addChord = false;
-                    break;
-                }
-            }
-        }
         const staffEntry = measure.findOrCreateStaffEntry(
-            timestamp, 0, this.staves[staffInd]).staffEntry;
+            timestamp, staffInd, this.staves[staffInd]).staffEntry;
+        console.log(staffEntry);
         const voiceEntry = measure.findOrCreateVoiceEntry(
             staffEntry, this.staves[staffInd].Voices[0]).voiceEntry;
         const note = new Note(voiceEntry, staffEntry, duration, pitch, measure, isRest);
         voiceEntry.Notes.push(note);
-        if (addChord)
+        if (timestamp.Equals(new Fraction()))
         {
             staffEntry.ChordContainers = [chord];
         }
@@ -226,7 +214,8 @@ export class ImcorviseMusicSheet extends MusicSheet
         }
         curRestDur.Add(new Fraction(1, 8));
         this.addRest(chord, staffInd, measure, curPos, curRestDur);
-
+        console.log(measure);
+        console.log(this.SourceMeasures[1]);
     }
 
     public getChords(measure: SourceMeasure): ChordSymbolContainer[]
@@ -465,7 +454,8 @@ export class ImcorviseMusicSheet extends MusicSheet
         let chordsOfSheet: ChordSymbolContainer[] = new Array(this.staves.length);
         for (let tempInd = 0; tempInd < this.staves.length; ++tempInd)
         {
-            chordsOfSheet[tempInd] = KrumhanslSchmuckler.getChord(this.totalLengths[tempInd]);
+            chordsOfSheet[tempInd] = KrumhanslSchmuckler.getChord(
+                this.totalLengths[tempInd], this.Rules);
         }
         for (let [measure, inds] of Array.from(this.selectedMeasures.entries()).sort(
             (a, b) => a[0].MeasureNumber - b[0].MeasureNumber))
@@ -483,7 +473,7 @@ export class ImcorviseMusicSheet extends MusicSheet
                         && this.uniquePitches.get(measure)[staveInd].size >= 2)
                     {
                         chord = KrumhanslSchmuckler.getChord(
-                            this.specificLengths.get(measure)[staveInd]);
+                            this.specificLengths.get(measure)[staveInd], this.Rules);
                     }
                     else
                     {
